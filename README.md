@@ -1,34 +1,34 @@
-# WarpDrive 🚀
+# WarpDrive Titan Edition 🌌
 
-**The Ultimate PC Setup & Package Manager for Windows.**
+**The Ultimate PC Arsenal for Windows 10 & 11.**
 
-WarpDrive is an advanced, colorized terminal utility designed to automate the installation of development tools, productivity apps, and system updates on fresh Windows PCs. It leverages `winget` and `npm` with an intelligent "Selection Cart" system.
+WarpDrive V8 "Titan" is the most powerful, feature-rich version of the utility ever built. It combines a massive library of 80+ professional tools with deep system-level debloating and extreme performance optimizations, all under a zero-distraction minimalist interface.
 
-## ✨ Features
+## 🔥 Key Pillars
 
-- 🛒 **Selection Cart**: Browse categories and queue dozens of apps to install all at once.
-- 🎨 **ANSI Color UI**: Professional-grade terminal interface with real-time status feedback.
-- 🔍 **Live Search**: Search the entire Winget database and add found packages to your installation queue.
-- 🛠️ **Smart Installation**: Automatically skips packages that are already installed.
-- 🔄 **Env Refresh**: Instantly updates your `PATH` environment variables without restarting the terminal.
-- 🛡️ **Admin Workarounds**: Handles apps that normally block administrator installations (e.g., Spotify).
-- 📜 **Session Logging**: Detailed logs of every installation success or failure in `setup_history.log`.
+- **80+ Titan Package Library**:
+  - **Cloud & Infra**: AWS, Azure, GCloud, Terraform, Kubectl, Docker.
+  - **Data Mastery**: PostgreSQL, MongoDB, Redis, DBeaver, TablePlus.
+  - **Networking**: Wireshark, Postman, Insomnia, WinSCP.
+  - **Dev UX**: JetBrains Mono Nerd Fonts, Windows Terminal.
+- **Deep Debloat 2026**:
+  - **Service Kill**: Disables telemetry, diagnostic tracking, and invasive stubs.
+  - **UI Purge**: One-click removal of Win11 Chat, Widgets, and Search Bloat.
+  - **AppX Flush**: Purges 20+ pre-installed Microsoft apps.
+- **Titan Optimization Engine**:
+  - **God Mode**: Infinite control settings on your desktop.
+  - **Ultimate Performance**: Unlocks the hidden Titan power profile.
+  - **Low Latency**: TCP Acknowledgment frequency and NTFS optimizations.
+- **Unified Clean CLI**: 100% plain text compatibility for zero rendering issues.
 
-## 🚀 Quick Start
+## 🚀 Execution
 
-1. Download `setup_pc.bat`.
-2. Right-click and **Run as Administrator**.
-3. Use the menu to add apps to your cart.
-4. Go to **Review Cart (9)** and press **Install**!
-
-## 📦 Supported Apps
-
-Supports 50+ applications out of the box, including:
-- **Dev Tools**: Python, Node.js, Git, Docker, VS Code, Cursor...
-- **Browsers**: Chrome, Firefox, Brave, Opera GX, Vivaldi...
-- **Productivity**: Notion, Slack, Discord, Obsidian, Teams...
-- **Media**: Spotify, OBS Studio, GIMP, VLC, Handbrake...
-- **System**: 7-Zip, PowerToys, HWInfo, CPU-Z, CrystalDiskInfo...
+1. Right-click `setup_pc.bat` -> **Run as Administrator**.
+2. **Setup Your System**:
+   - `D` to run the **Deep Debloat** modules.
+   - `T` to engage the **Titan Optimization Engine**.
+3. **Queue Tools**: Use Categories `1-7` to build your professional stack.
+4. **Deploy**: Press `9` and let the Titan Engine handle the rest.
 
 ## 📜 License
 
