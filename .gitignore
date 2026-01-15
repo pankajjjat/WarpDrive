@@ -1,0 +1,4 @@
+setup_history.log
+*.vbs
+%temp%
+.DS_Store
