@@ -1,338 +1,406 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: --- Advanced Configuration ---
-set "VERSION=4.0-ADVANCED"
+:: --- WarpDrive Kernel v8.2-DIRECT (TITAN EDITION) ---
+set "VERSION=8.2-DIRECT"
 set "LOG_FILE=setup_history.log"
-set "CART="
-set "CART_COUNT=0"
 
-:: --- Enable ANSI Colors via Registry ---
-reg add "HKCU\Console" /v VirtualTerminalLevel /t REG_DWORD /d 1 /f >nul 2>&1
-
-:: ANSI Escape Codes
-set "ESC="
-set "RED=%ESC%[91m"
-set "GREEN=%ESC%[92m"
-set "YELLOW=%ESC%[93m"
-set "BLUE=%ESC%[94m"
-set "MAGENTA=%ESC%[95m"
-set "CYAN=%ESC%[96m"
-set "WHITE=%ESC%[97m"
-set "RESET=%ESC%[0m"
-
-:: Check for Administrator privileges
+:: Check for Administrator
 >nul 2>&1 "%SYSTEMROOT%\system32\cacls.exe" "%SYSTEMROOT%\system32\config\system"
 if '%errorlevel%' NEQ '0' (
-    echo %YELLOW%Requesting administrative privileges...%RESET%
-    goto UACPrompt
-) else ( goto gotAdmin )
-
-:UACPrompt
-    echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\getadmin.vbs"
-    echo UAC.ShellExecute "%~s0", "", "", "runas", 1 >> "%temp%\getadmin.vbs"
-    "%temp%\getadmin.vbs"
+    echo [!] Administrator privileges required.
+    echo [!] Attempting to elevate Titan Engine...
+    powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /B
-
-:gotAdmin
-    if exist "%temp%\getadmin.vbs" ( del "%temp%\getadmin.vbs" )
-    pushd "%CD%"
-    CD /D "%~dp0"
-    echo [%DATE% %TIME%] --- Session Started: %VERSION% --- >> "%LOG_FILE%"
+)
 
 :MainMenu
 cls
-echo %CYAN%======================================================
-echo          ULTIMATE PC SETUP ^& PACKAGE MANAGER v%VERSION%
-echo ======================================================%RESET%
-echo  1. DEV CORE      5. MEDIA/DESIGN   9. %YELLOW%REVIEW CART (%CART_COUNT% items)%RESET%
-echo  2. IDEs/EDITORS  6. UTILS/SYSTEM   S. %GREEN%SEARCH ^& ADD%RESET%
-echo  3. PRODUCTIVITY  7. AI TOOLS       U. %CYAN%UPDATE ALL%RESET%
-echo  4. BROWSERS      8. SYS UPDATES    X. %RED%EXIT%RESET%
-echo %CYAN%======================================================%RESET%
-echo %WHITE%Current Cart: !CART!%RESET%
-set /p main_choice="Select Category or Action: "
+echo ----------------------------------------------------
+echo WARPDRIVE TITAN EDITION [v%VERSION%]
+echo ----------------------------------------------------
+echo * [0] Base Setup (Winget, Choco, PowerShell)
+echo * [1] Programming and Dev Core
+echo * [2] IDEs and Editors
+echo * [3] Cloud and Infrastructure
+echo * [4] Databases and Data Tools
+echo * [5] Web Browsers and Networking
+echo * [6] Media, Design and UI
+echo * [7] Utilities and System Analysis
+echo.
+echo * [D] DEEP DEBLOAT (Services, Taskbar, Apps)
+echo * [T] TITAN OPTIMIZATIONS (Power, Net, GodMode)
+echo * [Q] QUANTUM SEARCH (Winget Search)
+echo * [U] ULTIMATE MAINTENANCE (System Sync)
+echo.
+echo * [X] EXIT
+echo ----------------------------------------------------
+set /p opt="Selection> "
 
-if /i "%main_choice%"=="1" goto MenuDevCore
-if /i "%main_choice%"=="2" goto MenuIDEs
-if /i "%main_choice%"=="3" goto MenuProductivity
-if /i "%main_choice%"=="4" goto MenuBrowsers
-if /i "%main_choice%"=="5" goto MenuMedia
-if /i "%main_choice%"=="6" goto MenuUtilities
-if /i "%main_choice%"=="7" goto MenuAITools
-if /i "%main_choice%"=="8" goto UpdateSystem
-if /i "%main_choice%"=="9" goto ReviewCart
-if /i "%main_choice%"=="S" goto SearchPackages
-if /i "%main_choice%"=="U" goto UpdateApps
-if /i "%main_choice%"=="X" exit
+if /i "%opt%"=="0" goto MenuBaseTools
+if /i "%opt%"=="1" goto MenuDevCore
+if /i "%opt%"=="2" goto MenuIDEs
+if /i "%opt%"=="3" goto MenuCloud
+if /i "%opt%"=="4" goto MenuDatabases
+if /i "%opt%"=="5" goto MenuBrowsers
+if /i "%opt%"=="6" goto MenuMedia
+if /i "%opt%"=="7" goto MenuUtilities
+if /i "%opt%"=="D" goto WindowsDebloat
+if /i "%opt%"=="T" goto SystemTweaks
+if /i "%opt%"=="Q" goto SearchPackages
+if /i "%opt%"=="U" goto UpdateApps
+if /i "%opt%"=="X" exit
 goto MainMenu
 
-:: --- Category Menus (Simplified for Cart Logic) ---
+:: --- CATEGORY MENUS ---
+
+:MenuBaseTools
+cls
+echo --- BASE SETUP AND PACKAGE MANAGERS ---
+echo * [1] Update Winget (App Installer)
+echo * [2] Install Chocolatey (Choco)
+echo * [3] Install PowerShell 7 (Latest)
+echo * [4] Install Scoop
+echo.
+echo * [B] Back
+set /p sub="Selection> "
+if /i "%sub%"=="B" goto MainMenu
+if "%sub%"=="1" (
+    echo [TITAN] Updating Winget sources...
+    winget source update
+    pause
+)
+if "%sub%"=="2" (
+    echo [TITAN] Installing Chocolatey...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServiceProtocolType]::Tls12; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+    pause
+)
+if "%sub%"=="3" call :SmartInstall Microsoft.PowerShell
+if "%sub%"=="4" (
+    echo [TITAN] Installing Scoop...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "iex (new-object net.webclient).downloadstring('https://get.scoop.sh')"
+    pause
+)
+goto MenuBaseTools
 
 :MenuDevCore
 cls
-echo %BLUE%--- Programming ^& Dev Core ---%RESET%
-echo  1. Python 3.12       4. Docker Desktop   7. winSCP
-echo  2. Node.js LTS       5. Win Terminal     8. TablePlus
-echo  3. Git               6. Postman          9. Terminus
-echo %BLUE%------------------------------------------------------%RESET%
-echo  B. [Back]            C. [Clear Cart]     I. [Install Cart Now]
-set /p sub="Choice (Select num to add to cart): "
+echo --- PROGRAMMING AND DEV CORE ---
+echo * [1] Python 3.12       * [5] Docker Desktop     * [9] Rust (via Rustup)
+echo * [2] Node.js LTS       * [6] Windows Terminal   * [10] Java (OpenJDK 21)
+echo * [3] Git               * [7] .NET 8 SDK         * [11] Go Language
+echo * [4] C++ Build Tools   * [8] PowerShell 7       * [12] Ruby
+echo.
+echo * [B] Back
+set /p sub="Selection> "
 if /i "%sub%"=="B" goto MainMenu
-if /i "%sub%"=="C" set "CART=" & set "CART_COUNT=0" & goto MenuDevCore
-if /i "%sub%"=="I" goto ReviewCart
-if "%sub%"=="1" call :AddToCart Python.Python.3.12
-if "%sub%"=="2" call :AddToCart OpenJS.NodeJS.LTS
-if "%sub%"=="3" call :AddToCart Git.Git
-if "%sub%"=="4" call :AddToCart Docker.DockerDesktop
-if "%sub%"=="5" call :AddToCart Microsoft.WindowsTerminal
-if "%sub%"=="6" call :AddToCart Postman.Postman
-if "%sub%"=="7" call :AddToCart WinSCP.WinSCP
-if "%sub%"=="8" call :AddToCart TablePlus.TablePlus
-if "%sub%"=="9" call :AddToCart Terminus.Terminus
+if "%sub%"=="1" call :SmartInstall Python.Python.3.12
+if "%sub%"=="2" call :SmartInstall OpenJS.NodeJS.LTS
+if "%sub%"=="3" call :SmartInstall Git.Git
+if "%sub%"=="4" call :SmartInstall Microsoft.VisualStudio.2022.BuildTools
+if "%sub%"=="5" call :SmartInstall Docker.DockerDesktop
+if "%sub%"=="6" call :SmartInstall Microsoft.WindowsTerminal
+if "%sub%"=="7" call :SmartInstall Microsoft.DotNet.SDK.8
+if "%sub%"=="8" call :SmartInstall Microsoft.PowerShell
+if "%sub%"=="9" call :SmartInstall Rustlang.Rustup
+if "%sub%"=="10" call :SmartInstall Microsoft.OpenJDK.21
+if "%sub%"=="11" call :SmartInstall GoLang.Go
+if "%sub%"=="12" call :SmartInstall RubyInstallerTeam.Ruby.3.2
 goto MenuDevCore
 
 :MenuIDEs
 cls
-echo %BLUE%--- IDEs ^& Editors ---%RESET%
-echo  1. VS Code           3. Antigravity      5. Zed
-echo  2. Cursor            4. JetBrains Toolbox
-echo %BLUE%------------------------------------------------------%RESET%
-echo  B. [Back]            C. [Clear Cart]     I. [Install Cart Now]
-set /p sub="Choice: "
+echo --- IDEs AND EDITORS ---
+echo * [1] VS Code           * [4] JetBrains Toolbox  * [7] PyCharm Community
+echo * [2] Cursor            * [5] Zed Editor         * [8] IntelliJ Community
+echo * [3] Antigravity       * [6] Notepad++          * [9] Sublime Text 4
+echo.
+echo * [B] Back
+set /p sub="Selection> "
 if /i "%sub%"=="B" goto MainMenu
-if /i "%sub%"=="C" set "CART=" & set "CART_COUNT=0" & goto MenuIDEs
-if /i "%sub%"=="I" goto ReviewCart
-if "%sub%"=="1" call :AddToCart Microsoft.VisualStudioCode
-if "%sub%"=="2" call :AddToCart Anysphere.Cursor
-if "%sub%"=="3" call :AddToCart Google.Antigravity
-if "%sub%"=="4" call :AddToCart JetBrains.Toolbox
-if "%sub%"=="5" call :AddToCart Zed.Zed
+if "%sub%"=="1" call :SmartInstall Microsoft.VisualStudioCode
+if "%sub%"=="2" call :SmartInstall Anysphere.Cursor
+if "%sub%"=="3" call :SmartInstall Google.Antigravity
+if "%sub%"=="4" call :SmartInstall JetBrains.Toolbox
+if "%sub%"=="5" call :SmartInstall ZedIndustries.Zed
+if "%sub%"=="6" call :SmartInstall Notepad++.Notepad++
+if "%sub%"=="7" call :SmartInstall JetBrains.PyCharm.Community
+if "%sub%"=="8" call :SmartInstall JetBrains.IntelliJIDEA.Community
+if "%sub%"=="9" call :SmartInstall SublimeHQ.SublimeText.4
 goto MenuIDEs
 
-:MenuProductivity
+:MenuCloud
 cls
-echo %BLUE%--- Productivity ---%RESET%
-echo  1. Notion            3. Slack            5. Teams
-echo  2. Obsidian          4. Discord          6. Miro
-echo %BLUE%------------------------------------------------------%RESET%
-echo  B. [Back]            C. [Clear Cart]
-set /p sub="Choice: "
+echo --- CLOUD AND INFRASTRUCTURE ---
+echo * [1] AWS CLI           * [4] Terraform         * [7] Kubectl
+echo * [2] Azure CLI         * [5] Ansible (WSL)     * [8] Helm
+echo * [3] Google Cloud SDK  * [6] Docker Compose    * [9] Minikube
+echo.
+echo * [B] Back
+set /p sub="Selection> "
 if /i "%sub%"=="B" goto MainMenu
-if /i "%sub%"=="1" call :AddToCart Notion.Notion
-if /i "%sub%"=="2" call :AddToCart Obsidian.Obsidian
-if /i "%sub%"=="3" call :AddToCart SlackTechnologies.Slack
-if /i "%sub%"=="4" call :AddToCart Discord.Discord
-if /i "%sub%"=="5" call :AddToCart Microsoft.Teams
-if /i "%sub%"=="6" call :AddToCart Miro.Miro
-goto MenuProductivity
+if "%sub%"=="1" call :SmartInstall Amazon.AWSCLI
+if "%sub%"=="2" call :SmartInstall Microsoft.AzureCLI
+if "%sub%"=="3" call :SmartInstall Google.CloudSDK
+if "%sub%"=="4" call :SmartInstall Hashicorp.Terraform
+if "%sub%"=="5" echo [info] Ansible requires WSL. Install Ubuntu from Store. & pause
+if "%sub%"=="6" call :SmartInstall Docker.DockerCompose
+if "%sub%"=="7" call :SmartInstall Kubernetes.kubectl
+if "%sub%"=="8" call :SmartInstall Helm.Helm
+if "%sub%"=="9" call :SmartInstall Kubernetes.minikube
+goto MenuCloud
+
+:MenuDatabases
+cls
+echo --- DATABASES AND DATA TOOLS ---
+echo * [1] PostgreSQL 16     * [4] Redis (local)     * [7] TablePlus
+echo * [2] MongoDB Shell     * [5] DBeaver Community * [8] SQLite Browser
+echo * [3] MySQL Server      * [6] HeidiSQL          * [9] Compass (Mongo)
+echo.
+echo * [B] Back
+set /p sub="Selection> "
+if /i "%sub%"=="B" goto MainMenu
+if "%sub%"=="1" call :SmartInstall PostgreSQL.PostgreSQL.16
+if "%sub%"=="2" call :SmartInstall MongoDB.Shell
+if "%sub%"=="3" call :SmartInstall MariaDB.Server
+if "%sub%"=="4" call :SmartInstall Redis.Redis
+if "%sub%"=="5" call :SmartInstall DBeaver.DBeaver.Community
+if "%sub%"=="6" call :SmartInstall HeidiSQL.HeidiSQL
+if "%sub%"=="7" call :SmartInstall TablePlus.TablePlus
+if "%sub%"=="8" call :SmartInstall DBBrowserForSQLite.DBBrowserForSQLite
+if "%sub%"=="9" call :SmartInstall MongoDB.Compass.Community
+goto MenuDatabases
 
 :MenuBrowsers
 cls
-echo %BLUE%--- Browsers ---%RESET%
-echo  1. Chrome            3. Brave            5. Vivaldi
-echo  2. Firefox           4. Opera GX         6. Edge
-echo %BLUE%------------------------------------------------------%RESET%
-echo  B. [Back]            C. [Clear Cart]
-set /p sub="Choice: "
+echo --- WEB BROWSERS AND NETWORKING ---
+echo * [1] Google Chrome     * [4] Wireshark         * [7] Postman
+echo * [2] Mozilla Firefox   * [5] WinSCP            * [8] Insomnia
+echo * [3] Brave Browser     * [6] FileZilla         * [9] Charles Proxy
+echo.
+echo * [B] Back
+set /p sub="Selection> "
 if /i "%sub%"=="B" goto MainMenu
-if "%sub%"=="1" call :AddToCart Google.Chrome
-if "%sub%"=="2" call :AddToCart Mozilla.Firefox
-if "%sub%"=="3" call :AddToCart Brave.Brave
-if "%sub%"=="4" call :AddToCart Opera.OperaGX
-if "%sub%"=="5" call :AddToCart Vivaldi.Vivaldi
-if "%sub%"=="6" call :AddToCart Microsoft.Edge
+if "%sub%"=="1" call :SmartInstall Google.Chrome
+if "%sub%"=="2" call :SmartInstall Mozilla.Firefox
+if "%sub%"=="3" call :SmartInstall Brave.Brave
+if "%sub%"=="4" call :SmartInstall WiresharkFoundation.Wireshark
+if "%sub%"=="5" call :SmartInstall WinSCP.WinSCP
+if "%sub%"=="6" call :SmartInstall FileZilla.FileZilla
+if "%sub%"=="7" call :SmartInstall Postman.Postman
+if "%sub%"=="8" call :SmartInstall Insomnia.Insomnia
+if "%sub%"=="9" call :SmartInstall XK72.Charles
 goto MenuBrowsers
 
 :MenuMedia
 cls
-echo %BLUE%--- Media ^& Design ---%RESET%
-echo  1. Spotify           3. OBS Studio       5. VLC
-echo  2. GIMP              4. Audacity         6. Handbrake
-echo %BLUE%------------------------------------------------------%RESET%
-echo  B. [Back]            C. [Clear Cart]
-set /p sub="Choice: "
+echo --- MEDIA, DESIGN AND UI ---
+echo * [1] Spotify           * [4] Figma Desktop     * [7] JetBrains Mono NF
+echo * [2] VLC Media Player  * [5] OBS Studio        * [8] Fira Code
+echo * [3] GIMP              * [6] Audacity          * [9] Cascadia Code
+echo.
+echo * [B] Back
+set /p sub="Selection> "
 if /i "%sub%"=="B" goto MainMenu
-if "%sub%"=="1" call :AddToCart Spotify.Spotify USER
-if "%sub%"=="2" call :AddToCart GIMP.GIMP
-if "%sub%"=="3" call :AddToCart OBSProject.OBSStudio
-if "%sub%"=="4" call :AddToCart Audacity.Audacity
-if "%sub%"=="5" call :AddToCart VideoLAN.VLC
-if "%sub%"=="6" call :AddToCart Handbrake.Handbrake
+if "%sub%"=="1" call :SmartInstallUser Spotify.Spotify
+if "%sub%"=="2" call :SmartInstall VideoLAN.VLC
+if "%sub%"=="3" call :SmartInstall GIMP.GIMP.2
+if "%sub%"=="4" call :SmartInstall Figma.Figma
+if "%sub%"=="5" call :SmartInstall XPFFH613W8V6LV
+if "%sub%"=="6" call :SmartInstall Audacity.Audacity
+if "%sub%"=="7" call :SmartInstall DEVCOM.JetBrainsMonoNerdFont
+if "%sub%"=="8" echo [info] Fira Code: install manually or via font-category if available. & pause
+if "%sub%"=="9" echo [info] Cascadia Code is included with Windows Terminal. & pause
 goto MenuMedia
 
 :MenuUtilities
 cls
-echo %BLUE%--- Utilities ---%RESET%
-echo  1. 7-Zip             3. Rufus            5. CPU-Z
-echo  2. PowerToys         4. HWInfo           6. GPU-Z
-echo %BLUE%------------------------------------------------------%RESET%
-echo  B. [Back]            C. [Clear Cart]
-set /p sub="Choice: "
+echo --- UTILITIES AND SYSTEM ANALYSIS ---
+echo * [1] 7-Zip             * [4] PowerToys         * [7] WinDirStat
+echo * [2] HWInfo            * [5] Everything Search * [8] TreeSize Free
+echo * [3] Rufus             * [6] CrystalDiskInfo   * [9] CPU-Z / GPU-Z
+echo.
+echo * [B] Back
+set /p sub="Selection> "
 if /i "%sub%"=="B" goto MainMenu
-if "%sub%"=="1" call :AddToCart 7zip.7zip
-if "%sub%"=="2" call :AddToCart Microsoft.PowerToys
-if "%sub%"=="3" call :AddToCart Akeo.Rufus
-if "%sub%"=="4" call :AddToCart REALiX.HWiNFO
-if "%sub%"=="5" call :AddToCart CPUID.CPU-Z
-if "%sub%"=="6" call :AddToCart TechPowerUp.GPU-Z
+if "%sub%"=="1" call :SmartInstall 7zip.7zip
+if "%sub%"=="2" call :SmartInstall REALiX.HWiNFO
+if "%sub%"=="3" call :SmartInstall Rufus.Rufus
+if "%sub%"=="4" call :SmartInstall Microsoft.PowerToys
+if "%sub%"=="5" call :SmartInstall voidtools.Everything
+if "%sub%"=="6" call :SmartInstall CrystalDewWorld.CrystalDiskInfo
+if "%sub%"=="7" call :SmartInstall WinDirStat.WinDirStat
+if "%sub%"=="8" call :SmartInstall JAMSoftware.TreeSize.Free
+if "%sub%"=="9" call :SmartInstall CPUID.CPU-Z & call :SmartInstall TechPowerUp.GPU-Z
 goto MenuUtilities
 
-:MenuAITools
-cls
-echo %BLUE%--- AI Tools ---%RESET%
-echo  1. Ollama
-echo  2. Gemini CLI (NPM)
-echo %BLUE%------------------------------------------------------%RESET%
-echo  B. [Back]
-set /p sub="Choice: "
-if /i "%sub%"=="B" goto MainMenu
-if "%sub%"=="1" call :AddToCart Ollama.Ollama
-if "%sub%"=="2" call :AddToCart @google/gemini-cli NPM
-goto MenuAITools
+:: --- TITAN MODULES ---
 
-:: --- Core Action Engines ---
+:WindowsDebloat
+cls
+echo !!! TITAN DEEP DEBLOAT !!!
+echo.
+echo * [1] Standard Debloat (Apps + Privacy)
+echo * [2] DEEP Service Purge (Disable Telemetry/Tracking)
+echo * [3] Taskbar Cleanup (Remove Widgets, Chat, Search)
+echo * [4] TOTAL TITAN PURGE (All of the above)
+echo * [B] Back
+set /p dbl="Selection> "
+if /i "%dbl%"=="B" goto MainMenu
+if "%dbl%"=="1" (
+    call :RunAppXDebloat
+    call :RunPrivacyTweaks
+    pause & goto MainMenu
+)
+if "%dbl%"=="2" call :RunServicePurge & pause & goto MainMenu
+if "%dbl%"=="3" call :RunTaskbarCleanup & pause & goto MainMenu
+if "%dbl%"=="4" (
+    call :RunAppXDebloat
+    call :RunPrivacyTweaks
+    call :RunServicePurge
+    call :RunTaskbarCleanup
+    pause & goto MainMenu
+)
+goto WindowsDebloat
+
+:RunServicePurge
+echo [TITAN] Disabling non-essential services...
+sc stop SysMain >nul 2>&1 & sc config SysMain start= disabled >nul 2>&1
+sc stop DiagTrack >nul 2>&1 & sc config DiagTrack start= disabled >nul 2>&1
+sc stop dmwappushservice >nul 2>&1 & sc config dmwappushservice start= disabled >nul 2>&1
+sc stop TermService >nul 2>&1 & sc config TermService start= disabled >nul 2>&1
+echo [OK] Telemetry and background services restricted.
+goto :EOF
+
+:RunTaskbarCleanup
+echo [TITAN] Cleaning Windows 11 Taskbar...
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarDa" /t REG_DWORD /d 0 /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t REG_DWORD /d 0 /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Chat" /v "ChatIcon" /t REG_DWORD /d 3 /f >nul 2>&1
+echo [OK] Widgets, Search box, and Chat disabled.
+goto :EOF
+
+:RunAppXDebloat
+echo [TITAN] Massive purge of pre-installed apps...
+powershell -Command "& { $apps = @('Microsoft.XboxApp','Microsoft.XboxGameOverlay','Microsoft.ZuneVideo','Microsoft.ZuneMusic','Microsoft.BingNews','Microsoft.BingWeather','Microsoft.Getstarted','Microsoft.MicrosoftSolitaireCollection','Microsoft.SkypeApp','Microsoft.YourPhone','Microsoft.People','Microsoft.GetHelp','Microsoft.WindowsFeedbackHub','Microsoft.Messaging','Microsoft.MixedReality.Portal'); foreach ($app in $apps) { Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -ErrorAction SilentlyContinue } }"
+echo [OK] Junk apps removed.
+goto :EOF
+
+:RunPrivacyTweaks
+echo [TITAN] Hardening privacy registry...
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 0 /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "BingSearchEnabled" /t REG_DWORD /d 0 /f >nul 2>&1
+echo [OK] Privacy hardened.
+goto :EOF
+
+:SystemTweaks
+cls
+echo --- TITAN PERFORMANCE ENGINE ---
+echo.
+echo * [1] Unlock Ultimate Performance Plan
+echo * [2] Enable God Mode (Desktop Icon)
+echo * [3] Titan Network Engine (TCP/Ack Boost)
+echo * [4] Titan File Engine (NTFS Optimization)
+echo * [5] Kill All Startup Delays
+echo * [A] APPLY ALL TITAN TWEAKS
+echo * [B] Back
+set /p twk="Selection> "
+if /i "%twk%"=="B" goto MainMenu
+if "%twk%"=="1" (
+    powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 >nul 2>&1
+    echo [OK] Ultimate Performance Plan Unlocked.
+)
+if "%twk%"=="2" (
+    mkdir "%USERPROFILE%\Desktop\GodMode.{ED7BA470-8E54-465E-825C-99712043E01C}" >nul 2>&1
+    echo [OK] God Mode active on Desktop.
+)
+if "%twk%"=="3" (
+    powershell -Command "foreach($int in (Get-NetAdapter | Where-Object Status -eq 'Up').InterfaceIndex) { New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces' -Name TcpAckFrequency -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue }"
+    echo [OK] Network latency optimized.
+)
+if "%twk%"=="4" fsutil behavior set disablelastaccess 1 >nul 2>&1 & echo [OK] NTFS Faster.
+if "%twk%"=="5" (
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /f >nul 2>&1
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t REG_DWORD /d 0 /f >nul 2>&1
+    echo [OK] Boot speed increased.
+)
+if /i "%twk%"=="A" (
+    powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 >nul 2>&1
+    mkdir "%USERPROFILE%\Desktop\GodMode.{ED7BA470-8E54-465E-825C-99712043E01C}" >nul 2>&1
+    powershell -Command "foreach($int in (Get-NetAdapter | Where-Object Status -eq 'Up').InterfaceIndex) { New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces' -Name TcpAckFrequency -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue }"
+    fsutil behavior set disablelastaccess 1 >nul 2>&1
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /f >nul 2>&1
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t REG_DWORD /d 0 /f >nul 2>&1
+    echo [OK] Titan engine fully engaged.
+)
+pause
+goto SystemTweaks
 
 :SearchPackages
 cls
-echo %YELLOW%--- Search ^& Add ---%RESET%
-set /p sq="Search query (or B to back): "
-if /i "%sq%"=="B" goto MainMenu
+echo --- QUANTUM SEARCH ---
+set /p sq="Search Package: "
 winget search "%sq%"
-set /p sid="Enter Winget ID to add to cart (or skip): "
-if not "%sid%"=="" call :AddToCart %sid%
-goto SearchPackages
-
-:ReviewCart
-cls
-if "%CART%"=="" echo %RED%Cart is empty!%RESET% & pause & goto MainMenu
-echo %GREEN%======================================================
-echo          SELECTION CART REVIEW
-echo ======================================================%RESET%
-echo Items to install: %WHITE%!CART!%RESET%
-echo %GREEN%======================================================%RESET%
-set /p confirm="Proceed with installation? (Y/N): "
-if /i "%confirm%" NEQ "Y" goto MainMenu
-
-echo.
-echo %CYAN%Starting Batch Installation...%RESET%
-for %%a in (!CART!) do (
-    set "PKG=%%a"
-    :: Check for flags
-    if "!PKG!"=="USER" ( 
-        :: Handled by previous call logic 
-    ) else if "!PKG!"=="NPM" (
-        :: Handled by previous call logic
-    ) else (
-        :: Normal installation (This loop is a bit tricky with flags, so we'll 
-        :: re-run a simplified cart processor)
-    )
-)
-
-:: Re-processing the cart more cleanly
-for %%i in (!CART_LOG!) do (
-    set "item=%%i"
-    :: Split item: PKGID|TYPE
-    for /f "tokens=1,2 delims=|" %%a in ("!item!") do (
-        if "%%b"=="USER" (
-            call :SmartInstallUser %%a
-        ) else if "%%b"=="NPM" (
-            call :SmartInstallNPM %%a
-        ) else (
-            call :SmartInstall %%a
-        )
-    )
-)
-
-echo %GREEN%All installations complete!%RESET%
-echo %YELLOW%Refreshing environment variables...%RESET%
-call :RefreshEnv
-set "CART="
-set "CART_COUNT=0"
-set "CART_LOG="
-pause
-goto MainMenu
-
-:UpdateSystem
-echo.
-echo %CYAN%--- Updating Windows ^& Drivers ---%RESET%
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { if (!(Get-Module -ListAvailable PSWindowsUpdate)) { Write-Host 'Installing PSWindowsUpdate...' -ForegroundColor Cyan; Install-Module -Name PSWindowsUpdate -Force -AllowClobber -Scope CurrentUser }; Import-Module PSWindowsUpdate; Get-WindowsUpdate -Install -AcceptAll -AutoReboot }"
+set /p sid="Enter ID to install: "
+if not "%sid%"=="" call :SmartInstall %sid%
 pause
 goto MainMenu
 
 :UpdateApps
-echo.
-echo %MAGENTA%--- Upgrading All Apps ---%RESET%
+echo [TITAN] Running Ultimate Maintenance...
+echo > [1/3] Windows System Updates...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { if (!(Get-Module -ListAvailable PSWindowsUpdate)) { Install-Module -Name PSWindowsUpdate -Force -AllowClobber -Scope CurrentUser }; Import-Module PSWindowsUpdate; Get-WindowsUpdate -Install -AcceptAll -AutoReboot }"
+echo > [2/3] Application Suite Upgrade...
 winget upgrade --all --silent --accept-package-agreements
-pause
-goto MainMenu
+echo > [3/3] Disk Integrity (Cleanup)...
+cleanmgr /sageset:1 & cleanmgr /sagerun:1
+echo [OK] System health restored.
+pause & goto MainMenu
 
-:: --- Advanced Helper Functions ---
-
-:AddToCart
-set "pkg=%~1"
-set "type=%~2"
-if "%type%"=="" set "type=WINGET"
-
-:: Check for duplicates
-echo !CART! | findstr /C:"%pkg% " >nul
-if %errorlevel% equ 0 (
-    echo %YELLOW%[%pkg% is already in cart]%RESET%
-) else (
-    set "CART=!CART!%pkg% "
-    set "CART_LOG=!CART_LOG! "%pkg%|%type%""
-    set /a CART_COUNT+=1
-    echo %GREEN%[Added %pkg% to cart]%RESET%
-)
-timeout /t 1 >nul
-goto :EOF
+:: --- KERNEL ENGINE ---
 
 :SmartInstall
 set "p=%~1"
-echo %WHITE%[%p%] Checking...%RESET%
+echo [CHECK] %p%...
 winget list --id "%p%" --exact >nul 2>&1
-if %errorlevel% equ 0 (
-    echo %YELLOW%[SKIP] %p% already exists.%RESET%
+if %errorlevel% equ 0 ( 
+    echo [SKIP] %p% already installed.
+    pause
 ) else (
-    echo %BLUE%[INSTALL] %p%...%RESET%
+    echo [TITAN-INSTALL] %p%...
     winget install --id "%p%" --silent --accept-package-agreements --accept-source-agreements
     if %errorlevel% equ 0 ( 
-        echo %GREEN%[SUCCESS] %p% installed.%RESET%
-        echo [%DATE% %TIME%] SUCCESS: %p% >> "%LOG_FILE%"
-    ) else (
-        echo %RED%[FAIL] %p% installation failed.%RESET%
-        echo [%DATE% %TIME%] FAILED: %p% >> "%LOG_FILE%"
+        echo [OK] %p% installed successfully. >> "%LOG_FILE%"
+    ) else ( 
+        echo [FAIL] %p% installation failed. >> "%LOG_FILE%"
     )
+    pause
 )
 goto :EOF
 
 :SmartInstallUser
 set "p=%~1"
-echo %WHITE%[%p%] Checking (User Context)...%RESET%
 winget list --id "%p%" --exact >nul 2>&1
-if %errorlevel% equ 0 (
-    echo %YELLOW%[SKIP] %p% already exists.%RESET%
+if %errorlevel% equ 0 ( 
+    echo [SKIP] %p% already installed.
+    pause
 ) else (
-    echo %BLUE%[INSTALL] %p% via runas...%RESET%
+    echo [TITAN-USER] %p%...
     runas /trustlevel:0x20000 "cmd /c winget install --id %p% --silent --accept-package-agreements --accept-source-agreements"
-    echo [%DATE% %TIME%] ATTEMPT: %p% (User Context) >> "%LOG_FILE%"
+    pause
 )
 goto :EOF
 
 :SmartInstallNPM
 set "p=%~1"
-echo %WHITE%[%p%] Checking NPM...%RESET%
 call npm list -g "%p%" >nul 2>&1
-if %errorlevel% equ 0 (
-    echo %YELLOW%[SKIP] %p% already exists.%RESET%
+if %errorlevel% equ 0 ( 
+    echo [SKIP] %p% already installed.
+    pause
 ) else (
-    echo %BLUE%[INSTALL] %p% via npm...%RESET%
+    echo [TITAN-NPM] %p%...
     call npm install -g "%p%"
-    echo [%DATE% %TIME%] NPM: %p% >> "%LOG_FILE%"
+    pause
 )
-goto :EOF
-
-:RefreshEnv
-powershell -Command "setx REFRESH_ENV_INTERNAL (Get-Date); [Environment]::SetEnvironmentVariable('PATH', [Environment]::GetEnvironmentVariable('PATH', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('PATH', 'User'), 'Process')"
-echo %GREEN%Environment variables refreshed!%RESET%
 goto :EOF
